@@ -18,7 +18,8 @@ variable "region" {
   description = "AWS default region"
 }
 
-variable "DD_API_KEY" {
+variable "datadog_api_key" {
   type        = string
   description = "Data dog api key"
+  sensitive   = true
 }
