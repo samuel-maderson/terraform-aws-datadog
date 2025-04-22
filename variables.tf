@@ -19,6 +19,6 @@ variable "region" {
 }
 
 variable "DD_API_KEY" {
-  type = string
+  type        = string
   description = "Data dog api key"
 }
