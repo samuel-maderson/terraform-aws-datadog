@@ -30,14 +30,6 @@ resource "aws_ecs_task_definition" "app_task" {
           readOnly = false
         }
       ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "cws-init"
-        }
-      }
     },
     {
       name = "datadog-agent"
@@ -74,14 +66,6 @@ resource "aws_ecs_task_definition" "app_task" {
         timeout = 5
         retries = 2
         startPeriod = 60
-      }
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "datadog-agent"
-        }
       }
     },
     {
