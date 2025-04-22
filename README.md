@@ -1,56 +1,47 @@
-```markdown
 # AWS ECS with Datadog Integration using Terraform
 
-This project provides a Terraform configuration to launch an AWS Elastic Container Service (ECS) cluster running an Nginx application, integrated with Datadog for monitoring and Cloud Workload Security (CWS). The project leverages AWS Fargate for serverless container execution and includes an Application Load Balancer (ALB) to handle traffic. Logs are sent to AWS CloudWatch and can be further integrated with Datadog.
+This project provides a Terraform configuration to launch an AWS Elastic Container Service (ECS) cluster running an Nginx application, integrated with Datadog for monitoring and Cloud Workload Security (CWS). It leverages AWS Fargate for serverless container execution and includes an Application Load Balancer (ALB) to handle traffic. Logs are sent to AWS CloudWatch and can be further integrated with Datadog.
 
-## Project Structure
-
-The project is structured as follows:
-
-```
-.
+## 📂 Project Structure
 ├── .github/workflows/deploy.yaml  # GitHub Actions workflow for CI/CD
-├── .gitignore                     # Specifies intentionally untracked files that Git should ignore
-├── ecs.tf                         # Defines the ECS cluster, task definition, and service
+├── .gitignore                     # Specifies intentionally untracked files for Git
+├── ecs.tf                         # Defines ECS cluster, task definition, and service
 ├── iam.tf                         # Defines IAM roles and policies for ECS tasks
-├── loadbalancer.tf                # Defines the Application Load Balancer, target group, and listener
-├── main.tf                        # Configures the Terraform backend and required providers
-├── network.tf                     # Defines the VPC, subnets, and security groups
-├── outputs.tf                     # Defines output values for easy access to deployed resources
-├── README.md                      # This file
-├── variables.tf                   # Defines input variables for the Terraform configuration
-```
+├── loadbalancer.tf                # Defines ALB, target group, and listener
+├── main.tf                        # Configures Terraform backend and required providers
+├── network.tf                     # Defines VPC, subnets, and security groups
+├── outputs.tf                     # Defines output values of deployed resources
+├── README.md                      # This file (Project documentation)
+├── variables.tf                   # Defines input variables for Terraform configuration
 
-## Prerequisites
+## ✅ Prerequisites
 
-Before you can deploy this infrastructure, you need to have the following:
+Before deploying, ensure you have:
 
-* **AWS Account:** You need an active AWS account.
-* **AWS CLI:** The AWS Command Line Interface should be installed and configured with credentials that have the necessary permissions to create AWS resources (e.g., `AdministratorAccess` for initial setup, but it's recommended to use more granular permissions for production).
-* **Terraform:** Terraform version `1.7.x` (as specified in the GitHub Actions workflow) or a compatible version should be installed on your local machine if you plan to run Terraform commands locally.
-* **Git:** Git should be installed to manage the project repository and for GitHub Actions to function.
-* **GitHub Repository:** The Terraform configuration should be in a GitHub repository to utilize the provided workflow.
-* **Datadog Account and API Key:** You need a Datadog account and a Datadog API key to enable the Datadog Agent in the ECS tasks.
-* **S3 Bucket for Terraform State:** An S3 bucket should be created in your AWS account (e.g., in `us-east-1` as configured) to store the Terraform state file. The bucket name should be updated in `main.tf`.
+* **AWS Account:** An active AWS account.
+* **AWS CLI:** Installed and configured with necessary permissions.
+* **Terraform:** Version `1.7.x` or compatible.
+* **Git:** Installed for repository management.
+* **GitHub Repository:** Project hosted on GitHub for workflow usage.
+* **Datadog Account & API Key:** For Datadog Agent integration.
+* **S3 Bucket for Terraform State:** Created in AWS (`us-east-1` configured).
 
-## Setup and Configuration
+## ⚙️ Setup and Configuration
 
-Follow these steps to set up and configure the project:
-
-1.  **Clone the Repository:** Clone this repository to your local machine.
+1.  **Clone Repository:**
     ```bash
     git clone <repository_url>
     cd <repository_name>
     ```
 
 2.  **Configure Terraform Backend (`main.tf`):**
-    Update the `backend "s3"` block in `main.tf` with the name of your S3 bucket and the desired region (if it's different from `us-east-1`).
+    Update with your S3 bucket details:
     ```terraform
     terraform {
       backend "s3" {
-        bucket = "your-terraform-state-bucket-name" # Replace with your bucket name
+        bucket = "your-terraform-state-bucket-name"
         key    = "terraform.tfstate"
-        region = "us-east-1"                     # Replace if your bucket is in a different region
+        region = "us-east-1" # Adjust if your bucket is in a different region
       }
       required_providers {
         aws = {
@@ -62,7 +53,7 @@ Follow these steps to set up and configure the project:
     ```
 
 3.  **Configure Datadog API Key (`ecs.tf`):**
-    In the `ecs.tf` file, locate the `datadog-agent` container definition and replace `<YOUR_DD_API_KEY>` with your actual Datadog API key. For production environments, consider using AWS Secrets Manager or SSM Parameter Store to manage this sensitive information.
+    Replace placeholder with your Datadog API key:
     ```terraform
     {
       name      = "datadog-agent",
@@ -79,82 +70,77 @@ Follow these steps to set up and configure the project:
     }
     ```
 
-4.  **Configure AWS Region (`.github/workflows/deploy.yaml`):**
-    In the `.github/workflows/deploy.yaml` file, ensure the `AWS_REGION` environment variable is set to the AWS region where you intend to deploy your infrastructure (e.g., `sa-east-1` for Brazil).
+4.  **Configure AWS Region (GitHub Workflow - `.github/workflows/deploy.yaml`):**
+    Set your desired AWS region:
     ```yaml
     env:
-      AWS_REGION: "sa-east-1" # Replace with your AWS region
+      AWS_REGION: "sa-east-1" # Replace with your AWS region (e.g., sa-east-1 for Brazil)
       // ... other environment variables ...
     ```
 
-5.  **Configure AWS Credentials in GitHub Secrets:**
-    Set up the following secrets in your GitHub repository under "Settings" -> "Secrets and variables" -> "Actions secrets":
-    * `AWS_ACCESS_KEY_ID`: Your AWS access key ID.
-    * `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key.
-    * `TF_STATE_BUCKET`: The name of your S3 bucket for Terraform state (should match the one in `main.tf`).
+5.  **Configure GitHub Secrets:**
+    In your GitHub repository settings, add the following secrets:
+    * `AWS_ACCESS_KEY_ID`
+    * `AWS_SECRET_ACCESS_KEY`
+    * `TF_STATE_BUCKET` (Your S3 bucket name)
 
-## Deployment
+## 🚀 Deployment
 
-You can deploy this infrastructure using either GitHub Actions (for CI/CD) or by running Terraform commands locally.
+Choose your preferred deployment method:
 
-### Using GitHub Actions (Recommended)
+### ☁️ Using GitHub Actions (CI/CD)
 
-1.  **Commit and Push Changes:** Commit all your configuration changes to the `main` branch of your GitHub repository. This will automatically trigger the GitHub Actions workflow defined in `.github/workflows/deploy.yaml`.
-2.  **Monitor Workflow:** Go to the "Actions" tab in your GitHub repository to monitor the progress of the workflow. The workflow will:
-    * Initialize Terraform.
-    * Format and validate the Terraform configuration.
-    * Plan the changes (on pull requests).
-    * Apply the changes (on pushes to the `main` branch).
+1.  **Commit & Push:** Push your changes to the `main` branch. This triggers the workflow.
+2.  **Monitor:** Check the "Actions" tab for workflow progress. It will handle initialization, formatting, validation, planning (on PRs), and applying (on `main` branch pushes).
 
-### Running Terraform Locally (For Testing or Manual Deployment)
+### 🛠️ Running Terraform Locally (Manual)
 
 1.  **Initialize Terraform:**
     ```bash
     terraform init
     ```
-2.  **Plan the Changes:**
+2.  **Plan Changes:**
     ```bash
     terraform plan
     ```
-3.  **Apply the Changes:**
+3.  **Apply Changes:**
     ```bash
     terraform apply -auto-approve
     ```
 
-## Architecture Overview
+## ⚙️ Architecture
 
-This project deploys the following AWS resources:
+This project deploys:
 
-* **VPC and Subnets (`network.tf`):** A new Virtual Private Cloud (VPC) with public subnets across multiple Availability Zones for high availability.
-* **Security Groups (`network.tf`, `loadbalancer.tf`):** Security groups to control inbound and outbound traffic for the ECS tasks and the Application Load Balancer.
-* **IAM Roles and Policies (`iam.tf`):** IAM roles with the necessary permissions for the ECS tasks to access other AWS services and for the ECS agent to manage resources on your behalf.
-* **ECS Cluster (`ecs.tf`):** A logical grouping for your containerized applications.
-* **ECS Task Definition (`ecs.tf`):** A blueprint for your Nginx container and the Datadog Agent, specifying the Docker images, resource requirements, port mappings, logging configuration (to CloudWatch), and Datadog integration.
-* **ECS Service (`ecs.tf`):** Runs and maintains a specified number of instances (default: 2) of your Nginx task definition within the ECS cluster on AWS Fargate.
-* **CloudWatch Log Group (`ecs.tf`):** A dedicated CloudWatch Log Group to collect logs from the ECS tasks.
-* **Application Load Balancer (ALB) (`loadbalancer.tf`):** Distributes incoming HTTP traffic to the ECS tasks.
-* **ALB Target Group (`loadbalancer.tf`):** Defines the targets (ECS tasks) that the ALB routes traffic to.
-* **ALB Listener (`loadbalancer.tf`):** Checks for incoming connections on port 80 and forwards them to the target group.
+* **VPC & Subnets (`network.tf`):** VPC with public subnets across AZs.
+* **Security Groups (`network.tf`, `loadbalancer.tf`):** For ECS tasks and ALB traffic control.
+* **IAM Roles & Policies (`iam.tf`):** Permissions for ECS tasks and agent.
+* **ECS Cluster (`ecs.tf`):** Logical grouping for containers.
+* **ECS Task Definition (`ecs.tf`):** Container configuration (Nginx, Datadog Agent). Includes Docker images, resources, ports, logging (CloudWatch), and Datadog setup.
+* **ECS Service (`ecs.tf`):** Manages Nginx task instances (default: 2) on Fargate.
+* **CloudWatch Log Group (`ecs.tf`):** Collects logs from ECS tasks.
+* **Application Load Balancer (ALB) (`loadbalancer.tf`):** Distributes HTTP traffic to ECS tasks.
+* **ALB Target Group (`loadbalancer.tf`):** Defines ECS tasks as traffic targets.
+* **ALB Listener (`loadbalancer.tf`):** Listens on port 80 and forwards traffic.
 
-## Datadog Integration
+## 📊 Datadog Integration
 
-The ECS tasks include the Datadog Agent as a sidecar container. This agent is configured to:
+The Datadog Agent runs as a sidecar in ECS tasks, configured to:
 
-* Collect infrastructure metrics from the Fargate tasks.
-* Potentially enable Cloud Workload Security (CWS) for runtime security monitoring.
-* The agent is configured using environment variables, including your Datadog API key.
+* Collect infrastructure metrics.
+* Enable Cloud Workload Security (CWS).
+* Configuration via environment variables (including API key).
 
-Logs from the Nginx container are sent to AWS CloudWatch using the `awslogs` log driver. To send these logs to Datadog, you need to configure the Datadog AWS integration in your Datadog account to collect logs from the specified CloudWatch Log Group (`/ecs/my-app-service/`).
+Nginx container logs are sent to AWS CloudWatch. To forward these to Datadog, configure the Datadog AWS integration in your Datadog account to collect from the `/ecs/my-app-service/` CloudWatch Log Group.
 
-## Outputs
+## 📤 Outputs
 
-The `outputs.tf` file defines values that are printed after a successful deployment, such as the DNS name of the Application Load Balancer, which you can use to access your Nginx application.
+The `outputs.tf` file provides access to key deployed resources, like the ALB DNS name.
 
-## Contributing
+## 🤝 Contributing
 
-Contributions to this project are welcome. Please feel free to submit pull requests or open issues for any improvements or bug fixes.
+Feel free to contribute by submitting pull requests or opening issues for improvements or bug fixes.
 
-## License
+## 📜 License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information.
-```
+This project is under the MIT License. See the `LICENSE` file for details.
