@@ -1,7 +1,7 @@
 resource "aws_iam_policy" "ecs_task_execution_policy" {
   name        = "${var.project_name}-ecs-task-execution-policy"
   description = "Policy for ECS task execution on Fargate"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -62,7 +62,7 @@ resource "aws_iam_role" "ecs_task_role" {
 resource "aws_iam_policy" "ecs_task_policy" {
   name        = "${var.project_name}-ecs-task-policy"
   description = "Policy for ECS task to access S3 (example)"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -70,7 +70,7 @@ resource "aws_iam_policy" "ecs_task_policy" {
           "s3:GetObject",
           "s3:ListBucket"
         ]
-        Effect   = "Allow"
+        Effect = "Allow"
         Resource = [
           "arn:aws:s3:::*",
           "arn:aws:s3:::*/*",

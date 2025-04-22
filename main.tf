@@ -13,8 +13,8 @@ provider "aws" {
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
-  name_prefix = "/aws/ecs/${var.project_name}/" # Customize the log group name prefix
-  retention_in_days = 7                # Set the retention period (in days)
+  name_prefix       = "/aws/ecs/${var.project_name}/" # Customize the log group name prefix
+  retention_in_days = 7                               # Set the retention period (in days)
 
   tags = {
     Environment = var.env # Adjust as needed

@@ -3,35 +3,35 @@ resource "aws_ecs_cluster" "default" {
 }
 
 resource "aws_ecs_task_definition" "app_task" {
-  family             = "${var.project_name}-task"
-  task_role_arn      = aws_iam_role.ecs_task_role.arn
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "awsvpc"
+  family                   = "${var.project_name}-task"
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                = 256
-  memory             = 512
+  cpu                      = 256
+  memory                   = 512
   volume {
     name = "cws-instrumentation-volume"
   }
   container_definitions = jsonencode([
     {
-        "name": "cws-instrumentation-init",
-        "image": "datadog/cws-instrumentation:latest",
-        "essential": false,
-        "user": "0",
-        "command": [
-            "/cws-instrumentation",
-            "setup",
-            "--cws-volume-mount",
-            "/cws-instrumentation-volume"
-        ],
-        "mountPoints": [
-            {
-                "sourceVolume": "cws-instrumentation-volume",
-                "containerPath": "/cws-instrumentation-volume",
-                "readOnly": false
-            }
-        ]
+      "name" : "cws-instrumentation-init",
+      "image" : "datadog/cws-instrumentation:latest",
+      "essential" : false,
+      "user" : "0",
+      "command" : [
+        "/cws-instrumentation",
+        "setup",
+        "--cws-volume-mount",
+        "/cws-instrumentation-volume"
+      ],
+      "mountPoints" : [
+        {
+          "sourceVolume" : "cws-instrumentation-volume",
+          "containerPath" : "/cws-instrumentation-volume",
+          "readOnly" : false
+        }
+      ]
     },
     {
       name      = "datadog-agent",
@@ -122,8 +122,8 @@ resource "aws_ecs_service" "app_service" {
   desired_count   = 2
   launch_type     = "FARGATE"
   network_configuration {
-    subnets         = [ data.aws_subnets.existing.ids[0], data.aws_subnets.existing.ids[1] ]
-    security_groups = [aws_security_group.ecs_tasks.id]
+    subnets          = [data.aws_subnets.existing.ids[0], data.aws_subnets.existing.ids[1]]
+    security_groups  = [aws_security_group.ecs_tasks.id]
     assign_public_ip = true
   }
   load_balancer {
