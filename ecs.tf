@@ -56,6 +56,10 @@ resource "aws_ecs_task_definition" "app_task" {
           name = "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED"
           value = "true"
         }
+        # {
+        #   name = "DD_LOG_LEVEL"
+        #   value = "debug"
+        # }
       ]
       healthCheck = {
         command = [
