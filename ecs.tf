@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "app_task" {
       environment = [
         {
           name  = "DD_API_KEY",
-          value = var.DD_API_KEY
+          value = var.datadog_api_key
         },
         {
           name  = "DD_SITE",
