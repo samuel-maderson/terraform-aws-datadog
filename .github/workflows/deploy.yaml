@@ -52,6 +52,5 @@ jobs:
       working-directory: ./
     - name: Terraform Apply
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      needs: [init, fmt, validate]
       run: terraform apply -auto-approve -input=false "tfplan"
       working-directory: ./
