@@ -13,10 +13,10 @@ resource "aws_ecs_task_definition" "app_task" {
   requires_compatibilities = ["FARGATE"]
   container_definitions = jsonencode([
     {
-      name = "cws-instrumentation-init"
-      image = "datadog/cws-instrumentation:latest"
+      name      = "cws-instrumentation-init"
+      image     = "datadog/cws-instrumentation:latest"
       essential = false
-      user = "0"
+      user      = "0"
       command = [
         "/cws-instrumentation",
         "setup",
@@ -25,35 +25,35 @@ resource "aws_ecs_task_definition" "app_task" {
       ]
       mountPoints = [
         {
-          sourceVolume = "cws-instrumentation-volume"
+          sourceVolume  = "cws-instrumentation-volume"
           containerPath = "/cws-instrumentation-volume"
-          readOnly = false
+          readOnly      = false
         }
       ]
     },
     {
-      name = "datadog-agent"
-      image = "datadog/agent:latest"
+      name      = "datadog-agent"
+      image     = "datadog/agent:latest"
       essential = true
       environment = [
         {
-          name = "DD_API_KEY"
+          name  = "DD_API_KEY"
           value = var.datadog_api_key
         },
         {
-          name = "DD_SITE"
+          name  = "DD_SITE"
           value = "us5.datadoghq.com"
         },
         {
-          name = "ECS_FARGATE"
+          name  = "ECS_FARGATE"
           value = "true"
         },
         {
-          name = "DD_RUNTIME_SECURITY_CONFIG_ENABLED"
+          name  = "DD_RUNTIME_SECURITY_CONFIG_ENABLED"
           value = "true"
         },
         {
-          name = "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED"
+          name  = "DD_RUNTIME_SECURITY_CONFIG_EBPFLESS_ENABLED"
           value = "true"
         }
         # {
@@ -66,14 +66,14 @@ resource "aws_ecs_task_definition" "app_task" {
           "CMD-SHELL",
           "/probe.sh"
         ]
-        interval = 30
-        timeout = 5
-        retries = 2
+        interval    = 30
+        timeout     = 5
+        retries     = 2
         startPeriod = 60
       }
     },
     {
-      name = "${var.project_name}-container"
+      name  = "${var.project_name}-container"
       image = "nginx:latest"
       portMappings = [
         {
@@ -86,13 +86,13 @@ resource "aws_ecs_task_definition" "app_task" {
         "/cws-instrumentation-volume/cws-instrumentation",
         "trace",
         "--",
-        ["nginx","-g","daemon off;"]
+        ["nginx", "-g", "daemon off;"]
       ]
       mountPoints = [
         {
-          sourceVolume = "cws-instrumentation-volume"
+          sourceVolume  = "cws-instrumentation-volume"
           containerPath = "/cws-instrumentation-volume"
-          readOnly = true
+          readOnly      = true
         }
       ]
       linux_parameters = {
@@ -103,11 +103,11 @@ resource "aws_ecs_task_definition" "app_task" {
       dependsOn = [
         {
           containerName = "datadog-agent"
-          condition = "HEALTHY"
+          condition     = "HEALTHY"
         },
         {
           containerName = "cws-instrumentation-init"
-          condition = "SUCCESS"
+          condition     = "SUCCESS"
         }
       ]
     }
