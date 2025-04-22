@@ -1,0 +1,27 @@
+# Terraform files
+.terraform/
+.terraform
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+_backend
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+# Credentials
+*.pem
+*.key
+*id_rsa
+*id_dsa
+*.pub
+
+# Cloud specific files
+.aws/ # If you're not managing AWS CLI config with Terraform
+
+# Other files
+*.log
+*.out
+tmp/

@@ -1,0 +1,57 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: "us-east-1"
+  TF_VERSION: "~> 5.0"
+  TF_WORKSPACE: "default"
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Terraform Init
+      id: init
+      run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}"
+      working-directory: ./
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check
+      working-directory: ./
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+      working-directory: ./
+    - name: Terraform Plan
+      id: plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan -no-color -input=false -out=tfplan
+      working-directory: ./
+    - name: Terraform Apply
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      needs: [init, fmt, validate]
+      run: terraform apply -auto-approve -input=false "tfplan"
+      working-directory: ./
