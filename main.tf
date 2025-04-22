@@ -1,4 +1,9 @@
 terraform {
+  backend "s3" {
+    bucket = "dev-aws-ecs-datadog-h89g7h8g7h9f"
+    key    = "terraform.tfstate"
+    region = "us-east-1"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -9,7 +14,7 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
