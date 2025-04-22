@@ -48,9 +48,9 @@ jobs:
     - name: Terraform Plan
       id: plan
       if: github.event_name == 'pull_request'
-      run: terraform plan -no-color -input=false -out=tfplan
+      run: terraform plan -no-color -input=false
       working-directory: ./
     - name: Terraform Apply
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve -input=false "tfplan"
+      run: terraform apply -auto-approve -input=false
       working-directory: ./
