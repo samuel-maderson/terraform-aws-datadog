@@ -35,7 +35,7 @@ jobs:
 
     - name: Terraform Init
       id: init
-      run: terraform init
+      run: terraform init -var "datadog_api_key=${{ secrets.DD_API_KEY }}"
       working-directory: ./
     - name: Terraform Format
       id: fmt
